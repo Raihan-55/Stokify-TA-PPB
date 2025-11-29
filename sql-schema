@@ -1,0 +1,34 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.bahan (
+  id bigint NOT NULL DEFAULT nextval('bahan_id_seq'::regclass),
+  nama text NOT NULL,
+  stok numeric DEFAULT 0,
+  satuan text NOT NULL,
+  harga_beli_rata numeric DEFAULT 0,
+  supplier text,
+  created_at timestamp without time zone DEFAULT now(),
+  gambar text,
+  CONSTRAINT bahan_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.keuangan (
+  id bigint NOT NULL DEFAULT nextval('keuangan_id_seq'::regclass),
+  tipe text NOT NULL,
+  jumlah numeric NOT NULL,
+  kategori text,
+  catatan text,
+  tanggal timestamp without time zone DEFAULT now(),
+  CONSTRAINT keuangan_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.produk (
+  id bigint NOT NULL DEFAULT nextval('produk_id_seq'::regclass),
+  nama text NOT NULL,
+  stok numeric DEFAULT 0,
+  satuan text NOT NULL,
+  harga numeric DEFAULT 0,
+  resep text,
+  created_at timestamp without time zone DEFAULT now(),
+  gambar text,
+  CONSTRAINT produk_pkey PRIMARY KEY (id)
+);
