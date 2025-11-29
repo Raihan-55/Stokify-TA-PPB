@@ -158,21 +158,12 @@ export default function ProdukDetail() {
 
       {!isNew && (
         <div className="mt-4 border p-2 rounded dark:bg-gray-800">
-          <h3 className="font-semibold mb-2">Atur Stok</h3>
-
-          <div className="flex items-center gap-4">
-            <button onClick={() => doUpdateStok(-1)} className="w-10 h-10 flex items-center justify-center text-xl border rounded bg-red-500 text-white">
-              -
-            </button>
-
-            <div className="text-lg font-bold">
-              {item.stok} {item.satuan}
-            </div>
-
-            <button onClick={() => doUpdateStok(1)} className="w-10 h-10 flex items-center justify-center text-xl border rounded bg-green-500 text-white">
-              +
-            </button>
+          <h3 className="font-semibold mb-2">Info Produk</h3>
+          <div>
+            Stok: {item.stok} {item.satuan}
           </div>
+          <div>Harga produk: Rp {item.harga}</div>
+          <div>Resep: {item.resep}</div>
         </div>
       )}
     </div>

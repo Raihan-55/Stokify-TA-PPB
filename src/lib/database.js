@@ -98,7 +98,7 @@ export async function updateStokProduk(id, jumlah) {
 }
 
 // Keuangan
-export async function getTransaksi(filter = {}) {
+export async function getAllTransaksi(filter = {}) {
   // filter: { from, to, kategori }
   let q = supabase.from("keuangan").select("*").order("tanggal", { ascending: false });
   if (filter.kategori) q = q.eq("kategori", filter.kategori);
@@ -108,7 +108,7 @@ export async function getTransaksi(filter = {}) {
   if (error) throw error;
   return data;
 }
-export async function getTransaksiById(id) {
+export async function getAllTransaksiById(id) {
   const { data, error } = await supabase.from("keuangan").select("*").eq("id", id).single();
   if (error) throw error;
   return data;
@@ -167,9 +167,9 @@ export async function getSummaryBulanan() {
       byMonth[key] = { pemasukan: 0, pengeluaran: 0 };
     }
 
-    if (t.tipe === "masuk") {
+    if (t.tipe === "pemasukan") {
       byMonth[key].pemasukan += Number(t.jumlah || 0);
-    } else if (t.tipe === "keluar") {
+    } else if (t.tipe === "pengeluaran") {
       byMonth[key].pengeluaran += Number(t.jumlah || 0);
     }
   });
@@ -190,9 +190,9 @@ export async function getSummaryHarian() {
       byDay[key] = { pemasukan: 0, pengeluaran: 0 };
     }
 
-    if (t.tipe === "masuk") {
+    if (t.tipe === "pemasukan") {
       byDay[key].pemasukan += Number(t.jumlah || 0);
-    } else if (t.tipe === "keluar") {
+    } else if (t.tipe === "pengeluaran") {
       byDay[key].pengeluaran += Number(t.jumlah || 0);
     }
   });
@@ -214,7 +214,7 @@ export default {
   updateProduk,
   deleteProduk,
   updateStokProduk,
-  getTransaksi,
+  getAllTransaksi,
   createTransaksi,
   deleteTransaksi,
   getSummaryBulanan,

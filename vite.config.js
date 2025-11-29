@@ -8,20 +8,35 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "Nama Aplikasi Kamu",
+        name: "Stokify",
         short_name: "App",
         description: "Aplikasi React + Vite + Tailwind PWA",
+        display: "standalone",
         theme_color: "#ffffff",
         icons: [
           {
-            src: "/pwa-192x192.png",
+            src: "/icon-192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/icon-512.png",
             sizes: "512x512",
             type: "image/png",
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,png,svg,ico,webp}"],
+
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) =>
+              request.destination === "document" || request.destination === "script" || request.destination === "style" || request.destination === "image" || request.destination === "font",
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "app-cache",
+            },
           },
         ],
       },

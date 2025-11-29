@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllBahan, deleteBahan } from "../lib/database";
+import { getAllBahan, deleteBahan, updateStokBahan } from "../lib/database";
 
 export default function BahanList() {
   const [list, setList] = useState([]);
   const [sort, setSort] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [sort]);
 
   async function load() {
     let b = await getAllBahan();
@@ -33,6 +34,30 @@ export default function BahanList() {
     load();
   }
 
+  async function handleIncrease(id) {
+    try {
+      setUpdatingId(id);
+      await updateStokBahan(id, 1);
+      await load();
+    } catch (err) {
+      console.error("Failed to increase stok", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleDecrease(id) {
+    try {
+      setUpdatingId(id);
+      await updateStokBahan(id, -1);
+      await load();
+    } catch (err) {
+      console.error("Failed to decrease stok", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -53,57 +78,76 @@ export default function BahanList() {
             <option value="nama-az">Nama A-Z</option>
             <option value="nama-za">Nama Z-A</option>
           </select>
-          <button onClick={load} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors">
-            Terapkan
-          </button>
+          {/* Tombol tambah (desktop) */}
+          <Link to="/bahan/new" className="hidden md:block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+            Tambah Bahan
+          </Link>
         </div>
       </div>
 
-{/* List View */}
-<div className="space-y-4">
-  {list.map((b) => (
-    <div
-      key={b.id}
-      className="flex items-center gap-4 p-4 rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200"
-    >
-      {/* Image */}
-      <Link to={`/bahan/${b.id}`}>
-        <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded-lg overflow-hidden">
-          {b.gambar ? (
-            <img src={b.gambar} alt={b.nama} className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-3xl text-gray-400">📦</span>
-          )}
-        </div>
-      </Link>
+      {/* List View */}
+      <div className="space-y-4">
+        {list.map((b) => (
+          <div
+            key={b.id}
+            className="flex items-center gap-4 p-4 rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200"
+          >
+            {/* Image */}
+            <Link to={`/bahan/${b.id}`}>
+              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded-lg overflow-hidden">
+                {b.gambar ? <img src={b.gambar} alt={b.nama} className="w-full h-full object-cover" /> : <span className="text-3xl text-gray-400">📦</span>}
+              </div>
+            </Link>
 
-      {/* Text */}
-      <Link to={`/bahan/${b.id}`} className="flex-1 block">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{b.nama}</h3>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          Stok: <span className="font-medium">{b.stok} {b.satuan}</span>
-        </div>
-      </Link>
+            {/* Text */}
+            <Link to={`/bahan/${b.id}`} className="flex-1 block">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{b.nama}</h3>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Stok:{" "}
+                <span className="font-medium">
+                  {b.stok} {b.satuan}
+                </span>
+              </div>
+            </Link>
 
-      {/* Actions */}
-      <div className="flex gap-2">
-        <Link
-          to={`/bahan/${b.id}`}
-          className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg text-center transition-colors"
-        >
-          Edit
-        </Link>
-        <button
-          onClick={() => handleDelete(b.id)}
-          className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          Hapus
-        </button>
+            {/* Actions + Stok Controls */}
+            <div className="flex flex-col items-end gap-3">
+              {/* Tombol Stok (+ / -) */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => updatingId !== b.id && handleDecrease(b.id)}
+                  disabled={updatingId === b.id}
+                  className="w-8 h-8 flex justify-center items-center rounded bg-blue-500 text-white disabled:opacity-50"
+                >
+                  -
+                </button>
+
+                <div className="text-sm font-medium">
+                  {b.stok} {b.satuan}
+                </div>
+
+                <button
+                  onClick={() => updatingId !== b.id && handleIncrease(b.id)}
+                  disabled={updatingId === b.id}
+                  className="w-8 h-8 flex justify-center items-center rounded bg-blue-500 text-white disabled:opacity-50"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Tombol Edit & Hapus */}
+              <div className="flex gap-2">
+                <Link to={`/bahan/${b.id}`} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg text-center transition-colors">
+                  Edit
+                </Link>
+                <button onClick={() => handleDelete(b.id)} className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  ))}
-</div>
-
 
       {/* Empty State */}
       {list.length === 0 && (

@@ -56,7 +56,7 @@ export default function Navbar() {
         {/* Logo/Brand */}
         <div className="flex items-center gap-2">
           <Link to="/" className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-            UMKM App
+            Stokify
           </Link>
         </div>
 
@@ -78,7 +78,7 @@ export default function Navbar() {
       {/* Mobile Top Header - Visible only on mobile */}
       <div className="md:hidden fixed top-0 left-0 w-full px-4 py-3 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 flex justify-between items-center z-50 shadow-sm">
         <Link to="/" className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-          UMKM App
+          Salwa Jelek
         </Link>
 
         {/* Dark Mode Toggle */}

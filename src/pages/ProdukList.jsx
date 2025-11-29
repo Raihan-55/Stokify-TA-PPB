@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllProduk, deleteProduk } from "../lib/database";
+import { getAllProduk, deleteProduk, updateStokProduk } from "../lib/database";
 
 export default function ProdukList() {
   const [list, setList] = useState([]);
@@ -8,7 +8,8 @@ export default function ProdukList() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [sort]);
+  const [updatingId, setUpdatingId] = useState(null);
 
   async function load() {
     let b = await getAllProduk();
@@ -33,6 +34,30 @@ export default function ProdukList() {
     load();
   }
 
+  async function handleIncrease(id) {
+    try {
+      setUpdatingId(id);
+      await updateStokProduk(id, 1);
+      await load();
+    } catch (err) {
+      console.error("Failed to increase stok produk", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleDecrease(id) {
+    try {
+      setUpdatingId(id);
+      await updateStokProduk(id, -1);
+      await load();
+    } catch (err) {
+      console.error("Failed to decrease stok produk", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       {/* Header */}
@@ -53,9 +78,9 @@ export default function ProdukList() {
             <option value="nama-az">Nama A-Z</option>
             <option value="nama-za">Nama Z-A</option>
           </select>
-          <button onClick={load} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors">
-            Terapkan
-          </button>
+          <Link to="/produk/new" className="hidden md:block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+            Tambah Produk
+          </Link>
         </div>
       </div>
 
@@ -85,14 +110,36 @@ export default function ProdukList() {
               </div>
             </Link>
 
-            {/* Action Buttons */}
-            <div className="px-4 pb-4 flex gap-2">
-              <Link to={`/produk/${b.id}`} className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg text-center transition-colors">
-                Edit
-              </Link>
-              <button onClick={() => handleDelete(b.id)} className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
-                Hapus
-              </button>
+            {/* Action Buttons + Stok Controls */}
+            <div className="px-4 pb-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => updatingId !== b.id && handleDecrease(b.id)}
+                  disabled={updatingId === b.id}
+                  className="w-8 h-8 flex justify-center items-center rounded bg-blue-500 text-white disabled:opacity-50"
+                >
+                  -
+                </button>
+                <div className="text-sm font-medium">
+                  {b.stok} {b.satuan}
+                </div>
+                <button
+                  onClick={() => updatingId !== b.id && handleIncrease(b.id)}
+                  disabled={updatingId === b.id}
+                  className="w-8 h-8 flex justify-center items-center rounded bg-blue-500 text-white disabled:opacity-50"
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <Link to={`/produk/${b.id}`} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg text-center transition-colors">
+                  Edit
+                </Link>
+                <button onClick={() => handleDelete(b.id)} className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+                  Hapus
+                </button>
+              </div>
             </div>
           </div>
         ))}

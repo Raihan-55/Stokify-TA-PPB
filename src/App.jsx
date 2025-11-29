@@ -6,30 +6,29 @@ import BahanList from "./pages/BahanList";
 import BahanDetail from "./pages/BahanDetail";
 import ProdukList from "./pages/ProdukList";
 import ProdukDetail from "./pages/ProdukDetail";
-import Keuangan from "./pages/Keuangan";
 import KeuanganList from "./pages/KeuanganList";
 import KeuanganDetail from "./pages/KeuanganDetail";
 import Profil from "./pages/Profil";
 import { getAllBahan } from "./lib/database";
 
 function App() {
-  useEffect(() => {
-    // example usage as requested
-    (async () => {
-      try {
-        const bahan = await getAllBahan();
-        console.log("Example getAllBahan:", bahan);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   // example usage as requested
+  //   (async () => {
+  //     try {
+  //       const bahan = await getAllBahan();
+  //       console.log("Example getAllBahan:", bahan);
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   })();
+  // }, []);
 
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
         <Navbar />
-        <main className="mb-10">
+        <main className="mb-10 sm:mb-0">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/bahan" element={<BahanList />} />

@@ -1,34 +1,43 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllBahan, getAllProduk, getTransaksi } from "../lib/database";
+import { getAllBahan, getAllProduk, getAllTransaksi, getSummaryBulanan } from "../lib/database";
 import ChartPengeluaran from "../components/ChartPengeluaran";
+import Hero from "../components/Hero";
 
 export default function Home() {
   const [bahanCount, setBahanCount] = useState(0);
   const [produkCount, setProdukCount] = useState(0);
   const [recent, setRecent] = useState([]);
-
-  const [bahanMap, setBahanMap] = useState({});
-  const [produkMap, setProdukMap] = useState({});
+  const [profilData, setProfilData] = useState({});
+  const [summaryBulanan, setSummaryBulanan] = useState({});
+  const now = new Date();
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const summaryBulanIni = summaryBulanan[currentMonthKey] || { pemasukan: 0, pengeluaran: 0 };
 
   useEffect(() => {
     async function load() {
       const b = await getAllBahan();
       setBahanCount(b.length);
 
-      const bMap = {};
-      b.forEach((i) => (bMap[i.id] = i));
-      setBahanMap(bMap);
-
       const p = await getAllProduk();
       setProdukCount(p.length);
 
-      const pMap = {};
-      p.forEach((i) => (pMap[i.id] = i));
-      setProdukMap(pMap);
-
-      const t = await getTransaksi();
+      const t = await getAllTransaksi();
+      // Tambahkan log untuk debug
+      console.log(
+        "Data transaksi:",
+        t.map((x) => ({ id: x.id, tanggal: x.tanggal }))
+      );
       setRecent(t.slice(0, 5));
+
+      async function loadExtra() {
+        const m = await getSummaryBulanan();
+        setSummaryBulanan(m);
+      }
+      loadExtra();
+
+      const data = JSON.parse(localStorage.getItem("profil") || "{}");
+      setProfilData(data);
     }
     load();
   }, []);
@@ -36,13 +45,7 @@ export default function Home() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
       {/* HERO SECTION */}
-      <div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 text-white p-6 lg:p-8 rounded-2xl shadow-lg overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight">Dashboard UMKM</h1>
-          <p className="mt-3 text-base lg:text-lg opacity-90">Kelola bahan, produk, dan transaksi keuangan UMKM Anda dalam satu dashboard sederhana.</p>
-        </div>
-        <div className="absolute right-4 top-4 opacity-10 text-[60px] lg:text-[100px] font-black select-none pointer-events-none">UMKM</div>
-      </div>
+      <Hero profilData={profilData} />
 
       {/* SUMMARY CARDS */}
       <div className="grid grid-cols-2 gap-4">
@@ -64,7 +67,7 @@ export default function Home() {
       </div>
 
       {/* ACTION BUTTONS - Stack on mobile, row on larger screens */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <div className="flex flex-col justify-end sm:flex-row gap-2 sm:gap-3">
         <Link to="/bahan/new" className="px-4 sm:px-5 py-2.5 sm:py-2 rounded-lg sm:rounded-xl bg-blue-600 text-white text-sm sm:text-base shadow hover:bg-blue-700 transition duration-200 text-center">
           Tambah Bahan
         </Link>
@@ -82,11 +85,12 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* CHART PENGELUARAN */}
-      <div className="rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-        <h2 className="text-center text-lg font-semibold mb-4 text-gray-900 dark:text-white">Grafik Pengeluaran</h2>
-        <div className="overflow-x-auto">
-          <ChartPengeluaran />
+      {/* CHART PENGELUARAN PEMASUKAN*/}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Chart Pengeluaran */}
+        <div className="lg:col-span-2 rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Laporan Keuangan</h2>
+          <ChartPengeluaran summaryBulanIni={summaryBulanIni} />
         </div>
       </div>
 

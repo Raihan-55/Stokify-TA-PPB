@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTransaksiById, createTransaksi, updateTransaksi } from "../lib/database";
+import { getAllTransaksiById, createTransaksi, updateTransaksi } from "../lib/database";
 
 export default function DetailKeuangan() {
   const { id } = useParams();
@@ -23,7 +23,7 @@ export default function DetailKeuangan() {
   }, [id]);
 
   async function load() {
-    const t = await getTransaksiById(id);
+    const t = await getAllTransaksiById(id);
     setForm(t);
   }
 
@@ -34,6 +34,10 @@ export default function DetailKeuangan() {
     if (!form.jumlah || Number(form.jumlah) === 0) return setErrorMessage("Jumlah tidak boleh nol");
     if (!form.tanggal) return setErrorMessage("Tanggal harus diisi");
 
+    let dataToSave = { ...form };
+    if (form.tipe === "pemasukan") {
+      dataToSave.kategori = ""; // atau "pemasukan"
+    }
     setSaving(true);
 
     try {
@@ -62,11 +66,13 @@ export default function DetailKeuangan() {
 
         <input type="number" value={form.jumlah} onChange={(e) => setForm({ ...form, jumlah: e.target.value })} placeholder="Jumlah" className="border p-2 w-full" />
 
-        <select value={form.kategori} onChange={(e) => setForm({ ...form, kategori: e.target.value })} className="border p-2 w-full">
-          <option value="bahan">bahan</option>
-          <option value="gaji">gaji</option>
-          <option value="lainnya">lainnya</option>
-        </select>
+        {form.tipe === "pengeluaran" && (
+          <select value={form.kategori} onChange={(e) => setForm({ ...form, kategori: e.target.value })} className="border p-2 w-full">
+            <option value="bahan">bahan</option>
+            <option value="gaji">gaji</option>
+            <option value="lainnya">lainnya</option>
+          </select>
+        )}
 
         <input value={form.catatan} onChange={(e) => setForm({ ...form, catatan: e.target.value })} placeholder="Catatan" className="border p-2 w-full" />
 

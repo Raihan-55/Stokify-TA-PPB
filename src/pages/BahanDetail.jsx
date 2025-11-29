@@ -168,7 +168,16 @@ export default function BahanDetail() {
         {successMessage && <div className="text-sm text-green-600">{successMessage}</div>}
       </form>
 
-      {!isNew && <StokControl stok={item.stok} satuan={item.satuan} onChange={doUpdateStok} harga={item.harga_beli_rata} supplier={item.supplier} />}
+      {!isNew && (
+        <div className="mt-4 border p-2 rounded dark:bg-gray-800">
+          <h3 className="font-semibold mb-2">Info Bahan</h3>
+          <div>
+            Stok: {item.stok} {item.satuan}
+          </div>
+          <div>Harga beli rata-rata: Rp {item.harga_beli_rata}</div>
+          <div>Supplier: {item.supplier}</div>
+        </div>
+      )}
     </div>
   );
 }
