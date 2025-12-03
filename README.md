@@ -1,3 +1,23 @@
+# Stokify - TA PRakPPB
+
+## Development
+## Offline / PWA
+
+- This app includes a simple offline-capable setup:
+	- A service worker (`public/sw.js`) caches the app shell and same-origin static assets so the UI can load offline after first visit.
+	- API responses (materials, products, finance summaries, profile etc.) are stored in `localStorage` so read views can show the latest fetched data when offline.
+	- Create / update / delete operations are blocked while offline. UI buttons are disabled and the API client throws an error if attempted offline.
+	- When the device returns online the app will automatically refetch key resources and update the cached data.
+
+To test the PWA behavior, build and serve the app (service worker registers only in production):
+
+```bash
+npm run build
+npx serve dist
+```
+
+Open the site, allow it to load fully, then turn off network in DevTools to test offline.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

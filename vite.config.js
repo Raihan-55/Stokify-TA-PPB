@@ -10,7 +10,7 @@ export default defineConfig({
       manifest: {
         name: "Stokify",
         short_name: "App",
-        description: "Aplikasi React + Vite + Tailwind PWA",
+        description: "Aplikasi Inventaris UMKM",
         display: "standalone",
         theme_color: "#ffffff",
         icons: [

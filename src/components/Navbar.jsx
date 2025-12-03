@@ -52,7 +52,7 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop Navbar - Hidden on mobile, visible on tablet and up */}
-      <nav className="hidden md:flex sticky top-0 px-4 lg:px-6 py-3 lg:py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 justify-between items-center z-50 shadow-sm">
+      <nav className="hidden md:flex sticky top-0 px-4 lg:px-6 py-3 lg:py-4 rounded-lg bg-white dark:bg-gray-800 justify-between items-center z-50 shadow-sm">
         {/* Logo/Brand */}
         <div className="flex items-center gap-2">
           <Link to="/" className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
@@ -78,7 +78,7 @@ export default function Navbar() {
       {/* Mobile Top Header - Visible only on mobile */}
       <div className="md:hidden fixed top-0 left-0 w-full px-4 py-3 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 flex justify-between items-center z-50 shadow-sm">
         <Link to="/" className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-          Salwa Jelek
+          Stockify
         </Link>
 
         {/* Dark Mode Toggle */}

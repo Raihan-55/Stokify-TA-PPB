@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllTransaksi, deleteTransaksi, getSummaryBulanan, getSummaryHarian } from "../lib/database";
+import useOnline from "../hooks/useOnline";
+import { DollarSign, TrendingUp, BarChart3, Calendar, Filter, Trash2 } from "lucide-react";
 
 export default function ListKeuangan() {
   const [list, setList] = useState([]);
@@ -9,6 +11,7 @@ export default function ListKeuangan() {
   const [summaryBulanan, setSummaryBulanan] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const online = useOnline();
 
   const now = new Date();
   const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -74,25 +77,20 @@ export default function ListKeuangan() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Memuat data...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Keuangan</h1>
-        <Link to="/keuangan/new" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors self-end sm:self-auto">
-          Tambah Transaksi
-        </Link>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <DollarSign size={28} className="text-blue-600" /> Keuangan
+        </h1>
+        {online ? (
+          <Link to="/keuangan/new" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors self-end sm:self-auto">
+            Tambah Transaksi
+          </Link>
+        ) : (
+          <button disabled className="px-4 py-2 bg-gray-300 text-white rounded-lg font-medium self-end sm:self-auto opacity-70">Offline</button>
+        )}
       </div>
 
       {errorMessage && (
@@ -103,10 +101,10 @@ export default function ListKeuangan() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
+        <div className="rounded-xl shadow-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg hover:scale-[1.01] transition-all animate-fadein">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-              <span className="text-green-600 dark:text-green-400 text-lg">💰</span>
+              <TrendingUp className="text-green-600 dark:text-green-400" size={20} />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Pemasukan Bulan Ini</p>
@@ -115,10 +113,10 @@ export default function ListKeuangan() {
           </div>
         </div>
 
-        <div className="rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
+        <div className="rounded-xl shadow-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg hover:scale-[1.01] transition-all animate-fadein">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
-              <span className="text-red-600 dark:text-red-400 text-lg">💸</span>
+              <DollarSign className="text-red-600 dark:text-red-400" size={20} />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Pengeluaran Bulan Ini</p>
@@ -127,14 +125,14 @@ export default function ListKeuangan() {
           </div>
         </div>
 
-        <div className="rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
+        <div className="rounded-xl shadow-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg hover:scale-[1.01] transition-all animate-fadein">
           <div className="flex items-center gap-3">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center ${
                 summaryBulanIni.pemasukan - summaryBulanIni.pengeluaran >= 0 ? "bg-green-100 dark:bg-green-900" : "bg-red-100 dark:bg-red-900"
               }`}
             >
-              <span className={`text-lg ${summaryBulanIni.pemasukan - summaryBulanIni.pengeluaran >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>📊</span>
+              <BarChart3 className={summaryBulanIni.pemasukan - summaryBulanIni.pengeluaran >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"} size={20} />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Saldo Bulan Ini</p>
@@ -147,11 +145,15 @@ export default function ListKeuangan() {
       </div>
 
       {/* Filter Bar */}
-      <div className="rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Filter Transaksi</h3>
+      <div className="rounded-xl shadow-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-all">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <Filter size={20} className="text-blue-600" /> Filter Transaksi
+        </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dari Tanggal</label>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <Calendar size={16} /> Dari Tanggal
+            </label>
             <input
               type="date"
               value={filter.from}
@@ -160,7 +162,9 @@ export default function ListKeuangan() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sampai Tanggal</label>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <Calendar size={16} /> Sampai Tanggal
+            </label>
             <input
               type="date"
               value={filter.to}
@@ -191,11 +195,15 @@ export default function ListKeuangan() {
 
       {/* Transaction Timeline */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Riwayat Transaksi</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <Calendar size={20} className="text-blue-600" /> Riwayat Transaksi
+        </h3>
 
         {list.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">💳</div>
+            <div className="mb-4 flex justify-center">
+              <DollarSign size={64} className="text-gray-400" />
+            </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Belum ada transaksi</h3>
             <p className="text-gray-500 dark:text-gray-400">Tambah transaksi pertama Anda untuk memulai.</p>
           </div>
@@ -204,9 +212,9 @@ export default function ListKeuangan() {
             {list.map((t, index) => (
               <div
                 key={t.id}
-                className="relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 
-                  border border-gray-200 dark:border-gray-700 shadow-sm 
-                  hover:shadow-md transition-all"
+                className="relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-gray-900 
+                  border border-gray-200 dark:border-gray-700 shadow-md 
+                  hover:shadow-lg hover:scale-[1.01] transition-all animate-fadein"
               >
                 {/* Timeline indicator */}
                 <div className="flex flex-col items-center">
@@ -244,8 +252,8 @@ export default function ListKeuangan() {
                     {t.tipe === "pengeluaran" ? "-" : "+"}Rp {t.jumlah.toLocaleString("id-ID")}
                   </div>
 
-                  <button onClick={() => doDelete(t.id)} className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
-                    Hapus
+                  <button onClick={() => doDelete(t.id)} disabled={!online} className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1 disabled:opacity-60">
+                    <Trash2 size={14} /> Hapus
                   </button>
                 </div>
               </div>
