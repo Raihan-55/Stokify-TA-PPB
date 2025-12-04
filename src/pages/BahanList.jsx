@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllBahan, deleteBahan, updateStokBahan } from "../lib/database";
+import { useLoading } from "../context/LoadingContext";
 import useOnline from "../hooks/useOnline";
 import { Trash2, Package, Plus } from "lucide-react";
 
@@ -9,6 +10,7 @@ export default function BahanList() {
   const [sort, setSort] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
 
+  const { showLoading, hideLoading } = useLoading();
   useEffect(() => {
     load();
   }, [sort]);
@@ -16,30 +18,39 @@ export default function BahanList() {
   const online = useOnline();
 
   async function load() {
-    let b = await getAllBahan();
-
-    // Sorting
-    if (sort === "stok-terbanyak") {
-      b.sort((a, b) => b.stok - a.stok);
-    } else if (sort === "stok-terendah") {
-      b.sort((a, b) => a.stok - b.stok);
-    } else if (sort === "nama-az") {
-      b.sort((a, b) => a.nama.localeCompare(b.nama));
-    } else if (sort === "nama-za") {
-      b.sort((a, b) => b.nama.localeCompare(a.nama));
+    showLoading();
+    try {
+      let b = await getAllBahan();
+      // Sorting
+      if (sort === "stok-terbanyak") {
+        b.sort((a, b) => b.stok - a.stok);
+      } else if (sort === "stok-terendah") {
+        b.sort((a, b) => a.stok - b.stok);
+      } else if (sort === "nama-az") {
+        b.sort((a, b) => a.nama.localeCompare(b.nama));
+      } else if (sort === "nama-za") {
+        b.sort((a, b) => b.nama.localeCompare(a.nama));
+      }
+      setList(b);
+    } finally {
+      hideLoading();
     }
-
-    setList(b);
   }
 
   async function handleDelete(id) {
     if (!confirm("Yakin ingin menghapus bahan ini?")) return;
     if (!online) return alert("Anda sedang offline — operasi hapus diblokir.");
-    await deleteBahan(id);
-    load();
+    showLoading();
+    try {
+      await deleteBahan(id);
+      await load();
+    } finally {
+      hideLoading();
+    }
   }
 
   async function handleIncrease(id) {
+    showLoading();
     try {
       setUpdatingId(id);
       await updateStokBahan(id, 1);
@@ -48,10 +59,12 @@ export default function BahanList() {
       console.error("Failed to increase stok", err);
     } finally {
       setUpdatingId(null);
+      hideLoading();
     }
   }
 
   async function handleDecrease(id) {
+    showLoading();
     try {
       setUpdatingId(id);
       await updateStokBahan(id, -1);
@@ -60,6 +73,7 @@ export default function BahanList() {
       console.error("Failed to decrease stok", err);
     } finally {
       setUpdatingId(null);
+      hideLoading();
     }
   }
 

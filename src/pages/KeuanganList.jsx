@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllTransaksi, deleteTransaksi, getSummaryBulanan, getSummaryHarian } from "../lib/database";
+import { useLoading } from "../context/LoadingContext";
 import useOnline from "../hooks/useOnline";
 import { DollarSign, TrendingUp, BarChart3, Calendar, Filter, Trash2 } from "lucide-react";
 
@@ -11,6 +12,7 @@ export default function ListKeuangan() {
   const [summaryBulanan, setSummaryBulanan] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const { showLoading, hideLoading } = useLoading();
   const online = useOnline();
 
   const now = new Date();
@@ -23,12 +25,14 @@ export default function ListKeuangan() {
 
   async function loadInitialData() {
     setLoading(true);
+    showLoading();
     try {
       await Promise.all([load(), loadSummary()]);
     } catch (err) {
       setErrorMessage("Gagal memuat data");
     } finally {
       setLoading(false);
+      hideLoading();
     }
   }
 
@@ -70,10 +74,12 @@ export default function ListKeuangan() {
 
   async function applyFilter() {
     setLoading(true);
+    showLoading();
     try {
       await load();
     } finally {
       setLoading(false);
+      hideLoading();
     }
   }
 
@@ -89,7 +95,9 @@ export default function ListKeuangan() {
             Tambah Transaksi
           </Link>
         ) : (
-          <button disabled className="px-4 py-2 bg-gray-300 text-white rounded-lg font-medium self-end sm:self-auto opacity-70">Offline</button>
+          <button disabled className="px-4 py-2 bg-gray-300 text-white rounded-lg font-medium self-end sm:self-auto opacity-70">
+            Offline
+          </button>
         )}
       </div>
 
@@ -252,7 +260,11 @@ export default function ListKeuangan() {
                     {t.tipe === "pengeluaran" ? "-" : "+"}Rp {t.jumlah.toLocaleString("id-ID")}
                   </div>
 
-                  <button onClick={() => doDelete(t.id)} disabled={!online} className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1 disabled:opacity-60">
+                  <button
+                    onClick={() => doDelete(t.id)}
+                    disabled={!online}
+                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors flex items-center gap-1 disabled:opacity-60"
+                  >
                     <Trash2 size={14} /> Hapus
                   </button>
                 </div>

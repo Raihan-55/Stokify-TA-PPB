@@ -1,36 +1,81 @@
-# Stokify - TA PRakPPB
+# 📦 Stokify – Aplikasi Inventaris UMKM
 
-## Development
-## Offline / PWA
+Stokify adalah aplikasi inventaris sederhana untuk UMKM makanan, membantu tracking bahan baku, produk jadi, dan transaksi keuangan. Dibangun menggunakan **React + Vite + Tailwind** serta mendukung **PWA**, sehingga tetap dapat dibuka meski tanpa internet.
 
-- This app includes a simple offline-capable setup:
-	- A service worker (`public/sw.js`) caches the app shell and same-origin static assets so the UI can load offline after first visit.
-	- API responses (materials, products, finance summaries, profile etc.) are stored in `localStorage` so read views can show the latest fetched data when offline.
-	- Create / update / delete operations are blocked while offline. UI buttons are disabled and the API client throws an error if attempted offline.
-	- When the device returns online the app will automatically refetch key resources and update the cached data.
+---
 
-To test the PWA behavior, build and serve the app (service worker registers only in production):
+## Cara Menjalankan
+
+### 1. Instal dependensi
+
+```bash
+npm install
+```
+
+### 2. Mode development
+
+```bash
+npm run dev
+```
+
+### 3. Build untuk produksi
 
 ```bash
 npm run build
 npx serve dist
 ```
 
-Open the site, allow it to load fully, then turn off network in DevTools to test offline.
+---
 
-# React + Vite
+## Fitur Utama
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### • Manajemen Bahan Baku
 
-Currently, two official plugins are available:
+Melihat daftar bahan, stok, satuan, harga rata-rata, dan supplier.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### • Manajemen Produk
 
-## React Compiler
+Melihat stok produk, harga, dan resep bila tersedia.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### • Keuangan UMKM
 
-## Expanding the ESLint configuration
+Mencatat pemasukan, pengeluaran, kategori transaksi, serta ringkasan harian & bulanan.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### • Mode Offline (PWA)
+
+Aplikasi tetap bisa dibuka meskipun tidak ada internet:
+
+- Data terakhir disimpan otomatis di `localStorage`.
+- CRUD diblokir saat offline (hanya bisa lihat data).
+- Saat online kembali, data akan tersinkron otomatis.
+
+### • Instal Seperti Aplikasi HP
+
+Dapat dipasang di Android/iOS/Desktop melalui fitur **“Add to Home Screen”**.
+
+---
+
+## Cara Menguji Mode Offline PWA
+
+1. Jalankan build:
+   ```bash
+   npm run build
+   npx serve dist
+   ```
+2. Akses aplikasi di browser.
+3. Buka DevTools → Network → set "Offline".
+4. Refresh halaman untuk memastikan:
+   - UI tetap tampil.
+   - Data terakhir muncul dari local cache.
+
+---
+
+## Catatan Tambahan
+
+- Aplikasi hanya menyimpan data offline **terakhir yang berhasil di-fetch**.
+- CRUD memerlukan koneksi internet karena menggunakan Supabase sebagai backend.
+
+---
+
+Terima kasih telah menggunakan **Stokify** 🎉  
+Aplikasi inventaris UMKM yang ringan, cepat, dan bisa offline.

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLoading } from "../context/LoadingContext";
 import { Link } from "react-router-dom";
 import { getAllBahan, getAllProduk, getAllTransaksi, getSummaryBulanan } from "../lib/database";
 import ChartPengeluaran from "../components/ChartPengeluaran";
@@ -16,31 +17,37 @@ export default function Home() {
   const now = new Date();
   const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const summaryBulanIni = summaryBulanan[currentMonthKey] || { pemasukan: 0, pengeluaran: 0 };
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     async function load() {
-      const b = await getAllBahan();
-      setBahanCount(b.length);
+      showLoading();
+      try {
+        const b = await getAllBahan();
+        setBahanCount(b.length);
 
-      const p = await getAllProduk();
-      setProdukCount(p.length);
+        const p = await getAllProduk();
+        setProdukCount(p.length);
 
-      const t = await getAllTransaksi();
-      // Tambahkan log untuk debug
-      console.log(
-        "Data transaksi:",
-        t.map((x) => ({ id: x.id, tanggal: x.tanggal }))
-      );
-      setRecent(t.slice(0, 5));
+        const t = await getAllTransaksi();
+        // Tambahkan log untuk debug
+        console.log(
+          "Data transaksi:",
+          t.map((x) => ({ id: x.id, tanggal: x.tanggal }))
+        );
+        setRecent(t.slice(0, 5));
 
-      async function loadExtra() {
-        const m = await getSummaryBulanan();
-        setSummaryBulanan(m);
+        async function loadExtra() {
+          const m = await getSummaryBulanan();
+          setSummaryBulanan(m);
+        }
+        await loadExtra();
+
+        const data = JSON.parse(localStorage.getItem("profil") || "{}");
+        setProfilData(data);
+      } finally {
+        hideLoading();
       }
-      loadExtra();
-
-      const data = JSON.parse(localStorage.getItem("profil") || "{}");
-      setProfilData(data);
     }
     load();
   }, []);

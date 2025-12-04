@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllProduk, deleteProduk, updateStokProduk } from "../lib/database";
+import { useLoading } from "../context/LoadingContext";
 import useOnline from "../hooks/useOnline";
 import { Trash2, Boxes, Plus } from "lucide-react";
 
@@ -8,6 +9,7 @@ export default function ProdukList() {
   const [list, setList] = useState([]);
   const [sort, setSort] = useState("");
 
+  const { showLoading, hideLoading } = useLoading();
   useEffect(() => {
     load();
   }, [sort]);
@@ -15,30 +17,39 @@ export default function ProdukList() {
   const online = useOnline();
 
   async function load() {
-    let b = await getAllProduk();
-
-    // Sorting
-    if (sort === "stok-terbanyak") {
-      b.sort((a, b) => b.stok - a.stok);
-    } else if (sort === "stok-terendah") {
-      b.sort((a, b) => a.stok - b.stok);
-    } else if (sort === "nama-az") {
-      b.sort((a, b) => a.nama.localeCompare(b.nama));
-    } else if (sort === "nama-za") {
-      b.sort((a, b) => b.nama.localeCompare(a.nama));
+    showLoading();
+    try {
+      let b = await getAllProduk();
+      // Sorting
+      if (sort === "stok-terbanyak") {
+        b.sort((a, b) => b.stok - a.stok);
+      } else if (sort === "stok-terendah") {
+        b.sort((a, b) => a.stok - b.stok);
+      } else if (sort === "nama-az") {
+        b.sort((a, b) => a.nama.localeCompare(b.nama));
+      } else if (sort === "nama-za") {
+        b.sort((a, b) => b.nama.localeCompare(a.nama));
+      }
+      setList(b);
+    } finally {
+      hideLoading();
     }
-
-    setList(b);
   }
 
   async function handleDelete(id) {
     if (!confirm("Yakin ingin menghapus produk ini?")) return;
     if (!online) return alert("Anda sedang offline — operasi hapus diblokir.");
-    await deleteProduk(id);
-    load();
+    showLoading();
+    try {
+      await deleteProduk(id);
+      await load();
+    } finally {
+      hideLoading();
+    }
   }
 
   async function handleIncrease(id) {
+    showLoading();
     try {
       setUpdatingId(id);
       await updateStokProduk(id, 1);
@@ -47,10 +58,12 @@ export default function ProdukList() {
       console.error("Failed to increase stok produk", err);
     } finally {
       setUpdatingId(null);
+      hideLoading();
     }
   }
 
   async function handleDecrease(id) {
+    showLoading();
     try {
       setUpdatingId(id);
       await updateStokProduk(id, -1);
@@ -59,6 +72,7 @@ export default function ProdukList() {
       console.error("Failed to decrease stok produk", err);
     } finally {
       setUpdatingId(null);
+      hideLoading();
     }
   }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAllTransaksiById, createTransaksi, updateTransaksi } from "../lib/database";
+import { useLoading } from "../context/LoadingContext";
 import useOnline from "../hooks/useOnline";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -28,6 +29,7 @@ export default function DetailKeuangan() {
   const [errorMessage, setErrorMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const { showLoading, hideLoading } = useLoading();
   useEffect(() => {
     if (!isNew) load();
   }, [id]);
@@ -35,8 +37,13 @@ export default function DetailKeuangan() {
   const online = useOnline();
 
   async function load() {
-    const t = await getAllTransaksiById(id);
-    setForm(t);
+    showLoading();
+    try {
+      const t = await getAllTransaksiById(id);
+      setForm(t);
+    } finally {
+      hideLoading();
+    }
   }
 
   async function submit(e) {
@@ -51,7 +58,7 @@ export default function DetailKeuangan() {
       dataToSave.kategori = ""; // atau "pemasukan"
     }
     setSaving(true);
-
+    showLoading();
     try {
       if (!online) throw new Error("Offline: operasi simpan diblokir.");
       if (isNew) {
@@ -64,6 +71,7 @@ export default function DetailKeuangan() {
       setErrorMessage("Gagal menyimpan");
     } finally {
       setSaving(false);
+      hideLoading();
     }
   }
 

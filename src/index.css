@@ -7,3 +7,69 @@
   outline: none;
   box-shadow: none;
 }
+
+/* Aurora effect */
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-aurora {
+  background-size: 200% 200%;
+  animation: aurora 8s ease-in-out infinite;
+}
+
+/* Moving light wave */
+@keyframes wave {
+  0% { transform: translateX(-100%); opacity: 0.3; }
+  50% { opacity: 0.6; }
+  100% { transform: translateX(100%); opacity: 0.3; }
+}
+
+.animate-wave {
+  animation: wave 4s linear infinite;
+}
+
+/* Zoom + fade */
+@keyframes fadeZoom {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeZoom {
+  animation: fadeZoom 1.1s ease forwards;
+}
+
+/* Slow spin icon */
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 4s linear infinite;
+}
+
+/* Floating particles */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  top: 80%;
+  left: 50%;
+  opacity: 0.8;
+  filter: blur(2px);
+  animation: floatUp 5s linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translate(-50%, 0) scale(0.6); opacity: 0.5; }
+  100% { transform: translate(-50%, -1200%) scale(1.4); opacity: 0; }
+}
+
+.delay-150 { animation-delay: 0.15s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }

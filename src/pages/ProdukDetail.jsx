@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getProdukById, updateProduk, deleteProduk, updateStokProduk, createProduk } from "../lib/database";
+import { useLoading } from "../context/LoadingContext";
 import useOnline from "../hooks/useOnline";
 import { uploadImage, deleteImage } from "../lib/storage";
 import Card from "../components/Card";
@@ -77,6 +78,7 @@ export default function ProdukDetail() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  const { showLoading, hideLoading } = useLoading();
   useEffect(() => {
     if (id && !isNew) load();
   }, [id]);
@@ -84,8 +86,13 @@ export default function ProdukDetail() {
   const online = useOnline();
 
   async function load() {
-    const b = await getProdukById(id);
-    setItem(b);
+    showLoading();
+    try {
+      const b = await getProdukById(id);
+      setItem(b);
+    } finally {
+      hideLoading();
+    }
   }
 
   async function handleImageUpload(e) {
@@ -114,6 +121,7 @@ export default function ProdukDetail() {
       return;
     }
     setSaving(true);
+    showLoading();
     try {
       if (!online) throw new Error("Offline: operasi simpan diblokir.");
       if (isNew) await createProduk(item);
@@ -125,18 +133,25 @@ export default function ProdukDetail() {
       setErrorMessage("Gagal menyimpan data");
     } finally {
       setSaving(false);
+      hideLoading();
     }
   }
 
   async function doUpdateStok(delta) {
     if (isNew || !id) return;
     if (!online) return setErrorMessage("Anda sedang offline — operasi stok diblokir.");
-    await updateStokProduk(id, delta);
-    load();
+    showLoading();
+    try {
+      await updateStokProduk(id, delta);
+      await load();
+    } finally {
+      hideLoading();
+    }
   }
 
   async function doDelete() {
     if (isNew) return;
+    showLoading();
     if (item.gambar) {
       try {
         await deleteImage(item.gambar, "produk");
@@ -151,6 +166,8 @@ export default function ProdukDetail() {
     } catch (err) {
       console.error(err);
       setErrorMessage("Gagal menghapus produk");
+    } finally {
+      hideLoading();
     }
   }
 
