@@ -1,6 +1,7 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { HiHome, HiClipboardList, HiCube, HiCurrencyDollar, HiUser, HiSun, HiMoon } from "react-icons/hi";
+import { useAuth } from "../context/AuthContext";
+import { HiHome, HiClipboardList, HiCube, HiCurrencyDollar, HiUser, HiSun, HiMoon, HiLogout } from "react-icons/hi";
 
 const menus = [
   { name: "Home", path: "/", icon: <HiHome size={20} /> },
@@ -24,6 +25,13 @@ function DarkModeToggle({ dark, setDark }) {
 
 export default function Navbar() {
   const [dark, setDark] = useState(false);
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate("/login");
+  }
 
   useEffect(() => {
     const isDark = localStorage.getItem("dark") === "1";
@@ -72,6 +80,18 @@ export default function Navbar() {
           <div className="ml-2">
             <DarkModeToggle dark={dark} setDark={setDark} />
           </div>
+
+          {/* Logout Button */}
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="ml-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 transition-all duration-200 flex items-center gap-2"
+              title={`Logout: ${user.email}`}
+            >
+              <HiLogout size={16} />
+              <span>Logout</span>
+            </button>
+          )}
         </div>
       </nav>
 
@@ -97,6 +117,18 @@ export default function Navbar() {
             <span className="text-[10px] sm:text-xs font-medium">{menu.name}</span>
           </NavLink>
         ))}
+
+        {/* Logout Button Mobile */}
+        {user && (
+          <button
+            onClick={handleLogout}
+            className="flex flex-col items-center justify-center gap-0.5 py-2 px-1 text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-all duration-200"
+            title="Logout"
+          >
+            <HiLogout size={20} />
+            <span className="text-[10px]">Logout</span>
+          </button>
+        )}
       </nav>
 
       {/* Spacer for mobile - prevents content from being hidden under fixed navbars */}
